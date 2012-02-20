@@ -1,0 +1,3 @@
+<?php
+
+include_once('dlr_info.features.inc');
