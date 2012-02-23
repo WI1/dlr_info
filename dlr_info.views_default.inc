@@ -127,6 +127,7 @@ return $gid;',
   $handler->override_option('cache', array(
     'type' => 'none',
   ));
+  $handler->override_option('title', 'Info');
   $handler->override_option('row_plugin', 'node');
   $handler->override_option('row_options', array(
     'relationship' => 'none',
@@ -155,6 +156,7 @@ return $gid;',
   $handler->override_option('block_caching', -1);
   $translatables['info_listing'] = array(
     t('Block'),
+    t('Info'),
     t('Seite'),
     t('Standards'),
   );
