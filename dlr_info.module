@@ -38,7 +38,7 @@ function dlr_info_context_links_alter(&$links) {
     //setting a grant context link
     if(nodeaccess_access('grant', $node)){
        $item = menu_get_item('node/' . $node->nid . '/grant');
-       $links['node_access'] = array('title' => t('@name Zugriff bearbeiten', array('@name' => node_get_types('name', $node)), 'de'), 'href' => $item['href'], '#weight' => 2);     
+       $links['node_access'] = array('title' => t('@name zugriff bearbeiten', array('@name' => node_get_types('name', $node)), 'de'), 'href' => $item['href'], '#weight' => 2);     
     }
   }
 }
