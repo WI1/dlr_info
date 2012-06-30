@@ -14,12 +14,15 @@ function dlr_info_context_links_alter(&$links) {
   $path_query = $_GET['q'];
   if (context_get('context', 'dlr_groups_context_links')) {
     $links = array();
-    // The context_links button appaear for info page and pages with node in the url but not node edit
-    if($path_query === "info" || (strpos($path_query, "node") !== FALSE && strpos($path_query, "edit") === FALSE && strpos($path_query, "grant") === FALSE)) {
-      /* @var $active_space spaces_og class */
-      $active_space = spaces_get_space();
-      $item = menu_get_item('node/' . spaces_get_space()->id . '/edit');
-      $node_type = node_get_types('name', node_load(spaces_get_space()->id));
+    $node = menu_get_object();
+    /* @var $active_space spaces_og class */
+    $active_space = spaces_get_space();
+    $group_node = node_load($active_space->id);
+    
+    // The context_links button appaear for info page and pages with nod$group_nodee in the url but not node edit
+    if($group_node->nid == $node->nid && ($path_query === "info" || (strpos($path_query, "node") !== FALSE && strpos($path_query, "edit") === FALSE && strpos($path_query, "grant") === FALSE))) {
+      $item = menu_get_item('node/' . $active_space->id . '/edit');
+      $node_type = node_get_types('name', $group_node);
       if ($item['access']) {
         $links['admin_groups'] = array('title' => t('@name bearbeiten', array('@name' => $node_type), 'de'), 'href' => $item['href']);
       }
