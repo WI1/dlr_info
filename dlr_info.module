@@ -1,3 +1,41 @@
 <?php
 
 include_once('dlr_info.features.inc');
+
+
+/**
+ * Implementation of hook_context_links_alter().
+ * 
+ * Have only one context link button appear for dlr group nodes when the info tab is selected: Edit the node.
+ * 
+ * Have context links for all nodes which have dlr_nodes_context_links set
+ */
+function dlr_info_context_links_alter(&$links) {
+  $path_query = $_GET['q'];
+  if (context_get('context', 'dlr_groups_context_links')) {
+    $links = array();
+    // The context_links button appaear for info page and pages with node in the url but not node edit
+    if($path_query === "info" || (strpos($path_query, "node") !== FALSE && strpos($path_query, "edit") === FALSE && strpos($path_query, "grant") === FALSE)) {
+      /* @var $active_space spaces_og class */
+      $active_space = spaces_get_space();
+      $item = menu_get_item('node/' . spaces_get_space()->id . '/edit');
+      $node_type = node_get_types('name', node_load(spaces_get_space()->id));
+      if ($item['access']) {
+        $links['admin_groups'] = array('title' => t('@name bearbeiten', array('@name' => $node_type), 'de'), 'href' => $item['href']);
+      }
+    }
+  }
+  if (context_get('context', 'dlr_nodes_context_links')) {
+    $links = array();
+    $node = menu_get_object();
+    $item = menu_get_item('node/' . $node->nid . '/edit');
+    //Need to set the following context links for the node types mentioned in the context.
+    $links['edit_node'] = array('title' => t('@name bearbeiten', array('@name' => node_get_types('name', $node)), 'de'), 'href' => $item['href'], '#weight' => 0);
+    
+    //setting a grant context link
+    if(nodeaccess_access('grant', $node)){
+       $item = menu_get_item('node/' . $node->nid . '/grant');
+       $links['node_access'] = array('title' => t('@name Zugriff bearbeiten', array('@name' => node_get_types('name', $node)), 'de'), 'href' => $item['href'], '#weight' => 2);     
+    }
+  }
+}
