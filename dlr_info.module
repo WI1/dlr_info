@@ -17,10 +17,10 @@ function dlr_info_context_links_alter(&$links) {
     $node = menu_get_object();
     /* @var $active_space spaces_og class */
     $active_space = spaces_get_space();
-    $group_node = node_load($active_space->id);
+     $group_node = node_load($active_space->id);
     
     // The context_links button appaear for info page and pages with nod$group_nodee in the url but not node edit
-    if($group_node->nid == $node->nid && ($path_query === "info" || (strpos($path_query, "node") !== FALSE && strpos($path_query, "edit") === FALSE && strpos($path_query, "grant") === FALSE))) {
+    if($path_query === "info" || ($group_node->nid == $node->nid && strpos($path_query, "node") !== FALSE && strpos($path_query, "edit") === FALSE && strpos($path_query, "grant") === FALSE)) {
       $item = menu_get_item('node/' . $active_space->id . '/edit');
       $node_type = node_get_types('name', $group_node);
       if ($item['access']) {
