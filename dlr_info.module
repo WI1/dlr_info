@@ -40,5 +40,30 @@ function dlr_info_context_links_alter(&$links) {
        $item = menu_get_item('node/' . $node->nid . '/grant');
        $links['node_access'] = array('title' => t('Sichtbarkeitseinstellungen', array('@name' => node_get_types('name', $node)), 'de'), 'href' => $item['href'], '#weight' => 2);     
     }
+    
+    if($node->type == 'book'){
+       $item = menu_get_item('node/add/book');
+       $links['add_book'] = array('title' => t('@name hinzfügen', array('@name' => node_get_types('name', $node)), 'de'), 'href' => $item['href'], '#weight' => 1);     
+    }
+  }
+}
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function dlr_info_form_alter(&$form, $form_state, $form_id) {
+ // $form['#action']  = explode('search', $form['#action']); 
+  
+  switch ($form_id) {
+    // This is our form ID.
+    case 'atrium_search_form':
+      // Print out the $form array to see all the elements we are working with.
+      //$output .= dsm($form);
+      // Once I know which part of the array I'm after we can change it.
+     
+      // Change the Username field title to Login ID.
+      $form['#action'] = 'search';
+      unset($form['#space']);
+      break;
   }
 }
