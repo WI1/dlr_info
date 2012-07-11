@@ -44,7 +44,8 @@ function dlr_info_context_links_alter(&$links) {
     if($node->type == 'book'){
        $item = menu_get_item('node/add/book');
        $links['edit_node']['title'] = t('Seite bearbeiten', NULL,'de');
-       $links['add_book'] = array('title' => t('Unterseite hinzfügen', NULL, 'de'), 'href' => $item['href'], '#weight' => 1);     
+       if($item['access'])
+        $links['add_book'] = array('title' => t('Unterseite hinzfügen', NULL, 'de'), 'href' => $item['href'], '#weight' => 1);     
     }
   }
 }
