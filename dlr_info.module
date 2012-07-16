@@ -54,19 +54,12 @@ function dlr_info_context_links_alter(&$links) {
  * Implementation of hook_form_alter().
  */
 function dlr_info_form_alter(&$form, $form_state, $form_id) {
- // $form['#action']  = explode('search', $form['#action']); 
-  
   switch ($form_id) {
-    // This is our form ID.
+    case 'search_form':
+    case 'search_theme_form':
     case 'atrium_search_form':
-      // Print out the $form array to see all the elements we are working with.
-      //$output .= dsm($form);
-      // Once I know which part of the array I'm after we can change it.
-     
-      // Change the Username field title to Login ID.
-      unset ($_REQUEST['destination']);
-      $form['#action'] = 'search';
-      $form['submit']['#submit'] = array('dlr_info_apachesolr_search_form_submit'); 
+      unset($_REQUEST['destination']);
+      $form['submit']['#submit'] = array('dlr_info_apachesolr_search_form_submit');
       break;
   }
 }
@@ -86,7 +79,7 @@ function dlr_info_apachesolr_search_form_submit(&$form, &$form_state) {
   // Add an appropriate filter if we were searching from within a group
   $current_space = spaces_get_space();
   if ($current_space && $current_space->type == 'og') { 
-    $query = 'filters=im_og_gid:'. $current_space->id;
+  //  $query = 'filters=im_og_gid:'. $current_space->id;
   }
   global $base_url;
   $form_state['redirect'] = array($base_url.'/search/apachesolr_search/'. $search, $query);
