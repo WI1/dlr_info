@@ -64,8 +64,32 @@ function dlr_info_form_alter(&$form, $form_state, $form_id) {
       // Once I know which part of the array I'm after we can change it.
      
       // Change the Username field title to Login ID.
+      unset ($_REQUEST['destination']);
       $form['#action'] = 'search';
-      unset($form['#space']);
+      $form['submit']['#submit'] = array('dlr_info_apachesolr_search_form_submit'); 
       break;
   }
 }
+
+/** 
+ * Send the searches to apachesolr
+ */
+function dlr_info_apachesolr_search_form_submit(&$form, &$form_state) { 
+  // Look for our search terms in the right place
+  if ($form_state['values']['search']) { 
+    $search = $form_state['values']['search'];
+  }
+  else { 
+    $search = $form_state['values']['keys'];
+  }
+
+  // Add an appropriate filter if we were searching from within a group
+  $current_space = spaces_get_space();
+  if ($current_space && $current_space->type == 'og') { 
+    $query = 'filters=im_og_gid:'. $current_space->id;
+  }
+  global $base_url;
+  $form_state['redirect'] = array($base_url.'/search/apachesolr_search/'. $search, $query);
+}
+
+
