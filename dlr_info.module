@@ -53,7 +53,7 @@ function dlr_info_context_links_alter(&$links) {
 /**
  * Implementation of hook_form_alter().
  */
-function dlr_info_form_alter(&$form, $form_state, $form_id) {
+function dlr_info_form_alter(&$form, &$form_state, $form_id) {
   switch ($form_id) {
     case 'search_form':
     case 'search_theme_form':
@@ -68,6 +68,7 @@ function dlr_info_form_alter(&$form, $form_state, $form_id) {
  * Send the searches to apachesolr
  */
 function dlr_info_apachesolr_search_form_submit(&$form, &$form_state) { 
+  drupal_set_message('asxaxasxa','error');
   // Look for our search terms in the right place
   if ($form_state['values']['search']) { 
     $search = $form_state['values']['search'];
