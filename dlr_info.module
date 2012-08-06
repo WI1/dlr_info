@@ -33,8 +33,9 @@ function dlr_info_context_links_alter(&$links) {
     $node = menu_get_object();
     $item = menu_get_item('node/' . $node->nid . '/edit');
     //Need to set the following context links for the node types mentioned in the context.
-    $links['edit_node'] = array('title' => t('@name bearbeiten', array('@name' => node_get_types('name', $node)), 'de'), 'href' => $item['href'], '#weight' => 0);
-    
+    if ($item['access']) {
+      $links['edit_node'] = array('title' => t('@name bearbeiten', array('@name' => node_get_types('name', $node)), 'de'), 'href' => $item['href'], '#weight' => 0);
+    }
     //setting a grant context link
     if(nodeaccess_access('grant', $node)){
        $item = menu_get_item('node/' . $node->nid . '/grant');
