@@ -17,10 +17,10 @@ function dlr_info_context_links_alter(&$links) {
     $node = menu_get_object();
     /* @var $active_space spaces_og class */
     $active_space = spaces_get_space();
-     $group_node = node_load($active_space->id);
-    
+    $group_node = node_load($active_space->id);
+
     // The context_links button appaear for info page and pages with nod$group_nodee in the url but not node edit
-    if($path_query === "info" || ($group_node->nid == $node->nid && strpos($path_query, "node") !== FALSE && strpos($path_query, "edit") === FALSE && strpos($path_query, "grant") === FALSE)) {
+    if ($path_query === "info" || ($group_node->nid == $node->nid && strpos($path_query, "node") !== FALSE && strpos($path_query, "edit") === FALSE && strpos($path_query, "grant") === FALSE)) {
       $item = menu_get_item('node/' . $active_space->id . '/edit');
       $node_type = node_get_types('name', $group_node);
       if ($item['access']) {
@@ -37,16 +37,19 @@ function dlr_info_context_links_alter(&$links) {
       $links['edit_node'] = array('title' => t('@name bearbeiten', array('@name' => node_get_types('name', $node)), 'de'), 'href' => $item['href'], '#weight' => 0);
     }
     //setting a grant context link
-    if(nodeaccess_access('grant', $node)){
-       $item = menu_get_item('node/' . $node->nid . '/grant');
-       $links['node_access'] = array('title' => t('Sichtbarkeitseinstellungen', array('@name' => node_get_types('name', $node)), 'de'), 'href' => $item['href'], '#weight' => 2);     
+    if (nodeaccess_access('grant', $node)) {
+      $item = menu_get_item('node/' . $node->nid . '/grant');
+      $links['node_access'] = array('title' => t('Sichtbarkeitseinstellungen', array('@name' => node_get_types('name', $node)), 'de'), 'href' => $item['href'], '#weight' => 2);
     }
-    
-    if($node->type == 'book'){
-       $item = menu_get_item('node/add/book');
-       $links['edit_node']['title'] = t('Seite bearbeiten', NULL,'de');
-       if($item['access'])
-        $links['add_book'] = array('title' => t('Unterseite hinzfügen', NULL, 'de'), 'href' => $item['href'], '#weight' => 1);     
+
+    if ($node->type == 'book') {
+      $item = menu_get_item('node/' . $node->nid . '/edit');
+      //Need to set the following context links for the node types mentioned in the context.
+      if ($item['access']) 
+        $links['edit_node'] = array('title' => t('Seite bearbeiten', NULL, 'de'), 'href' => $item['href'], '#weight' => 0);
+      $item = menu_get_item('node/add/book');
+      if ($item['access'])
+        $links['add_book'] = array('title' => t('Unterseite hinzfügen', NULL, 'de'), 'href' => $item['href'], '#weight' => 1);
     }
   }
 }
