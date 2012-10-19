@@ -13,14 +13,18 @@ include_once('dlr_info.features.inc');
 function dlr_info_context_links_alter(&$links) {
   $path_query = $_GET['q'];
   if (context_get('context', 'dlr_groups_context_links')) {
-    $links = array();
+    // It is a group node
     $node = menu_get_object();
     /* @var $active_space spaces_og class */
     $active_space = spaces_get_space();
     $group_node = node_load($active_space->id);
-
-    // The context_links button appaear for info page and pages with nod$group_nodee in the url but not node edit
-    if ($path_query === "info" || ($group_node->nid == $node->nid && strpos($path_query, "node") !== FALSE && strpos($path_query, "edit") === FALSE && strpos($path_query, "grant") === FALSE)) {
+    $links = array();
+    // The context_links button appaear for info page and pages with $group_node in the url but not node edit
+    if ($path_query === "info" ||
+            ($group_node->nid == $node->nid && strpos($path_query, "node") !== FALSE &&
+            strpos($path_query, "edit") === FALSE &&
+            strpos($path_query, "grant") === FALSE)) {
+      // Remove old links and insert Edit group context link for info page
       $item = menu_get_item('node/' . $active_space->id . '/edit');
       $node_type = node_get_types('name', $group_node);
       if ($item['access']) {
@@ -28,6 +32,28 @@ function dlr_info_context_links_alter(&$links) {
       }
     }
   }
+
+  // Add blog context button for news
+  if ($path_query === "Aktuelles") {
+    // Edit group context link for info page
+    $links = array();
+    $item = menu_get_item('node/add/blog');
+    $node_type = node_get_types('name', $group_node);
+    if ($item['access']) {
+      $links['event'] = array('title' => t('Blogeintrag hinzfügen', NULL, 'de'), 'href' => $item['href'], '#weight' => 1);
+    }
+  }
+  // Add event context button for calendar
+  if ($path_query === "calendar") {
+    // Edit group context link for info page
+    $links = array();
+    $item = menu_get_item('node/add/event');
+    $node_type = node_get_types('name', $group_node);
+    if ($item['access']) {
+      $links['event'] = array('title' => t('Termine hinzfügen', NULL, 'de'), 'href' => $item['href'], '#weight' => 1);
+    }
+  }
+
   if (context_get('context', 'dlr_nodes_context_links')) {
     $links = array();
     $node = menu_get_object();
@@ -45,7 +71,7 @@ function dlr_info_context_links_alter(&$links) {
     if ($node->type == 'book') {
       $item = menu_get_item('node/' . $node->nid . '/edit');
       //Need to set the following context links for the node types mentioned in the context.
-      if ($item['access']) 
+      if ($item['access'])
         $links['edit_node'] = array('title' => t('Seite bearbeiten', NULL, 'de'), 'href' => $item['href'], '#weight' => 0);
       $item = menu_get_item('node/add/book');
       if ($item['access'])
