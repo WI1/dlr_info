@@ -11,7 +11,8 @@ include_once('dlr_info.features.inc');
  * Have context links for all nodes which have dlr_nodes_context_links set
  */
 function dlr_info_context_links_alter(&$links) {
-  $path_query = $_GET['q'];
+  $path_query = explode("/", $_GET['q']);
+  $path_query = $path_query[0];
   if (context_get('context', 'dlr_groups_context_links')) {
     // It is a group node
     $node = menu_get_object();
@@ -177,4 +178,26 @@ function dlr_oa_litecal_timeslot($timespan, $start, $date, $format, $quickadd = 
   return "<div {$attr}>
     <a $link_attr>{$add}<span class='num'>{$formatted}</span></a>
   </div>";
+}
+
+/**
+ * Implementation of hook_menu_alter().
+ * 
+ * Redirect logged in user to profile on user/register
+ * 
+ */
+function dlr_info_menu_alter(&$items){
+     $items['user/login']['access callback'] = 'myreg_register_access';
+  
+}
+
+
+function myreg_register_access() {
+
+  // in the original user module this function is 'user_register_access'
+  // return user_is_anonymous() && variable_get('user_register', 1); 
+  // i just simply removed the 'user_is_anonymous' call in the access check. so....
+
+  return variable_get('user_register', 1);
+
 }
