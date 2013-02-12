@@ -47,7 +47,7 @@ function dlr_info_context_links_alter(&$links) {
   // Add event context button for calendar
   if ($path_query === "calendar") {
     // Edit group context link for info page
-    $links = array();
+    $links = array(); 
     $item = menu_get_item('node/add/event');
     $node_type = node_get_types('name', $group_node);
     if ($item['access']) {
@@ -125,6 +125,12 @@ function dlr_info_theme_registry_alter(&$theme_registry) {
   }
 }
 
+/** 
+ * We use this custom function which is a slight modification over the original function. The Date argument in the url is passed in 
+ * German format instead of English. 'd.m.Y'.
+ */
+
+
 function dlr_oa_litecal_timeslot($timespan, $start, $date, $format, $quickadd = array()) {
   $add = '';
   $attr = array('style' => '');
@@ -187,7 +193,7 @@ function dlr_oa_litecal_timeslot($timespan, $start, $date, $format, $quickadd = 
  * 
  */
 function dlr_info_menu_alter(&$items){
-     $items['user/login']['access callback'] = 'myreg_register_access';
+   //  $items['user/login']['access callback'] = 'myreg_register_access';
   
 }
 
