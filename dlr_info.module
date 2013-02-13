@@ -123,7 +123,12 @@ function dlr_info_theme_registry_alter(&$theme_registry) {
   if (!empty($theme_registry['litecal_timeslot'])) {
     $theme_registry['litecal_timeslot']['function'] = 'dlr_oa_litecal_timeslot';
   }
+  if (!empty($theme_registry['litecal_timeitem'])) {
+    $theme_registry['litecal_timeitem']['function'] = 'dlr_oa_litecal_timeitem';
+  }
 }
+
+
 
 /** 
  * We use this custom function which is a slight modification over the original function. The Date argument in the url is passed in 
@@ -186,6 +191,70 @@ function dlr_oa_litecal_timeslot($timespan, $start, $date, $format, $quickadd = 
   </div>";
 }
 
+
+/**
+ * Theme a timespan item.
+ */
+function dlr_oa_litecal_timeitem($item, $granularity) {
+  $left = number_format($item->start / $granularity * 100, 2);
+  $width = number_format($item->size / $granularity * 100, 2);
+
+  $attr = array('style' => "left:{$left}%; width:{$width}%;");
+
+  $attr['class'] = 'litecal-item';
+  $attr['class'] .= $item->starts ? ' starts' : '';
+  $attr['class'] .= $item->ends ? ' ends' : '';
+
+  /* Change crayon to focusgroup colors for these event types. The color scheme is given below:
+   *  Förderschwerpunkttreffen > DemoScreen purple $item->id = 3
+    - Fokusgruppentreffen -> color of the focus group $item->id = 1
+    - Verbundprojekttreffen -> color of the focus group of the project $item->id = 2
+    - "Anderer Termin" -> neutral grey $item->id = 4
+   * 
+   */
+  $fg_crayoncode = "";
+  
+  switch($item->id ){
+    case 1:
+    case 2:
+      $fg_crayoncode = get_fg_crayon_code($item);
+      break;
+    case 3:
+      $fg_crayoncode = "fgall";
+      break;
+    case 4:
+      $fg_crayoncode = "fgnone";
+      break;
+  }
+  
+  if (module_exists('crayon')) {
+   // $attr['class'] .= ' crayon-anchor crayon-'. crayon_generate_index($item->id);
+    if (crayon_is_color($fg_crayoncode)) {
+      $attr['style'] = 'background-color:' . $fg_crayoncode;
+    }
+    else {
+      $attr['class'] .= ' crayon-anchor crayon-'. $fg_crayoncode;
+    }
+ //   $popup = theme('crayon_popup', $item->data, $item->id);
+      $popup = theme('crayon_popup_demoscreen', $item->data, $fg_crayoncode);
+  }
+  else {
+    $attr['class'] .= ' color';
+    $popup = '';
+  }
+
+  if (!empty($item->url)) {
+    return l("$popup<span class='litecal-data'>{$item->data}</span>", $item->url, array('attributes' => $attr, 'html' => TRUE));
+  }
+  else {
+    $attr = drupal_attributes($attr);
+    return "<div {$attr}>$popup<span class='litecal-data'>{$item->data}</span></div>";
+  }
+}
+
+
+
+
 /**
  * Implementation of hook_menu_alter().
  * 
@@ -206,4 +275,69 @@ function myreg_register_access() {
 
   return variable_get('user_register', 1);
 
+}
+
+
+function get_fg_crayon_code($item){
+  $nid = explode("/", $item->url);
+  $nid = $nid[1];
+  $event_node = node_load($nid);
+  //get the first group this node is a part of
+  $projectid = key($event_node->og_groups); 
+  $group = node_load($projectid);
+  if($group->type == "project"){
+    $fg = nodehierarchy_get_node_parent($projectid);
+    if(!isset($fg))
+      return "fgall"; //Demoscreen crayon code
+    $group = $fg;
+  }
+  return "fg".$group->nid;
+/*  if(isset($group->field_color_hex['0']['value']))
+    return $group->field_color_hex['0']['value'];
+  else
+    return "fgall";
+ * */
+ 
+}
+
+
+/**
+ * Implementation of hook_theme().
+ */
+function dlr_info_theme() {
+  $items = array();
+  //Inserting a new theming function for calendar crayon colors based on demoscreen colors
+  $items['crayon_popup_demoscreen'] = array(
+    'arguments' => array('label' => '', 'color' => NULL),
+    'template' => 'crayon-popup',
+    'file' => 'dlr_info.module',
+    
+  );
+  return $items;
+}
+
+
+/**
+ * Preprocessor for theme('crayon_popup_demoscreen').
+ * contains new color codes for demoscreen
+ */
+
+function template_preprocess_crayon_popup_demoscreen(&$vars) {
+  drupal_add_css(drupal_get_path('module', 'crayon') .'/crayon.css');
+
+  $vars['label'] = filter_xss_admin($vars['label']);
+  $vars['label_attr'] = array('class' => 'crayon-popup-label');
+
+  if (!empty($vars['color'])) {
+    $vars['attr'] = array('class' => 'crayon-swatch');
+    if (crayon_is_color($vars['color'])) {
+      $vars['attr']['style'] = 'background-color:' . $vars['color'];
+    }
+    else {
+      $vars['attr']['class'] .= ' crayon-' . $vars['color'];
+    }
+
+    // Indicate that this popup includes a swatch.
+    $vars['label_attr']['class'] .= ' with-swatch';
+  }
 }
