@@ -263,19 +263,21 @@ function dlr_oa_litecal_timeitem($item, $granularity) {
  * 
  */
 function dlr_info_menu_alter(&$items){
-   //  $items['user/login']['access callback'] = 'myreg_register_access';
+     $items['user/login']['access callback'] = 'dlr_info_register_access';
   
 }
 
 
-function myreg_register_access() {
+function dlr_info_register_access() {
 
-  // in the original user module this function is 'user_register_access'
-  // return user_is_anonymous() && variable_get('user_register', 1); 
-  // i just simply removed the 'user_is_anonymous' call in the access check. so....
-
-  return variable_get('user_register', 1);
-
+global $user;
+  if ($user->uid) {
+    drupal_set_message( t('You are already registered as a member.'), 'status', FALSE);
+    drupal_goto('user');
+  }
+  else {
+    return variable_get('user_register', 1);
+  }
 }
 
 
