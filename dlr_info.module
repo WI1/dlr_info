@@ -89,7 +89,6 @@ function dlr_info_form_alter(&$form, &$form_state, $form_id) {
     case 'search_form':
     case 'search_theme_form':
     case 'atrium_search_form':
-      unset($_REQUEST['destination']);
       $form['submit']['#submit'] = array('dlr_info_apachesolr_search_form_submit');
       break;
   }
@@ -103,8 +102,10 @@ function dlr_info_apachesolr_search_form_submit(&$form, &$form_state) {
   if ($form_state['values']['search']) { 
     $search = $form_state['values']['search'];
   }
-  else { 
+  else if ($form_state['values']['keys']){ 
     $search = $form_state['values']['keys'];
+  } else {
+    $search = current($form_state['values']);
   }
 
   // Add an appropriate filter if we were searching from within a group
@@ -112,8 +113,8 @@ function dlr_info_apachesolr_search_form_submit(&$form, &$form_state) {
   if ($current_space && $current_space->type == 'og') { 
   //  $query = 'filters=im_og_gid:'. $current_space->id;
   }
-  global $base_url;
-  $form_state['redirect'] = array($base_url.'/search/apachesolr_search/'. $search, $query);
+//  global $base_url;
+  $form_state['redirect'] = array('search/apachesolr_search/'. $search, $query);
 }
 
 /** 
