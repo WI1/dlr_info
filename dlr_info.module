@@ -263,8 +263,7 @@ function dlr_oa_litecal_timeitem($item, $granularity) {
  * 
  */
 function dlr_info_menu_alter(&$items){
-     $items['user/login']['access callback'] = 'dlr_info_register_access';
-  
+     $items['user/login']['access callback'] = 'dlr_info_register_access';  
 }
 
 
@@ -276,7 +275,7 @@ global $user;
     drupal_goto('user');
   }
   else {
-    return variable_get('user_register', 1);
+    return TRUE;
   }
 }
 
