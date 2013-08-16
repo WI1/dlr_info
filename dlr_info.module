@@ -79,7 +79,25 @@ function dlr_info_context_links_alter(&$links) {
         $links['add_book'] = array('title' => t('Unterseite hinzfügen', NULL, 'de'), 'href' => $item['href'], '#weight' => 1);
     }
   }
+  
+  // Have edit profile button for all users visible to admin users
+  
+  global $user;
+  if (module_exists('spaces') && ($space = spaces_get_space()) 
+  && $space->type == 'user' && $space->id != $user->uid && node_access('create', 'profile')) {
+    $prepend = array(
+      'profile' => array(
+        'title' => t('Edit profile'),
+        'href' => "user/{$space->id}/edit/profile",
+        'custom' => TRUE,
+      ),
+    );
+    $links = $prepend + $links;
+  }
 }
+
+
+
 
 /**
  * Implementation of hook_form_alter().
@@ -92,6 +110,11 @@ function dlr_info_form_alter(&$form, &$form_state, $form_id) {
       $form['submit']['#submit'] = array('dlr_info_apachesolr_search_form_submit');
       break;
   }
+  
+/*  switch ($form['#id']) {
+    case 'node-form':
+      $form['format']['guidelines'] = '';
+  }*/
 }
 
 /** 
